@@ -3,25 +3,21 @@ local M = {}
 local init = require("claude-annotator")
 
 local type_icons = {
-  edit = "",
   question = "",
   note = "",
 }
 
 local type_hl = {
-  edit = "ClaudeAnnotateEdit",
   question = "ClaudeAnnotateQuestion",
   note = "ClaudeAnnotateNote",
 }
 
 local type_hl_dim = {
-  edit = "ClaudeAnnotateEditDim",
   question = "ClaudeAnnotateQuestionDim",
   note = "ClaudeAnnotateNoteDim",
 }
 
 local type_border_hl = {
-  edit = "ClaudeAnnotateBorderEdit",
   question = "ClaudeAnnotateBorderQuestion",
   note = "ClaudeAnnotateBorderNote",
 }

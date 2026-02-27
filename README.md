@@ -1,6 +1,6 @@
 # Claude Annotator
 
-Inline annotations for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) responses. Read Claude's output in a Neovim side panel, highlight passages, and attach questions, edits, or notes — all without leaving your terminal.
+Inline annotations for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) responses. Read Claude's output in a Neovim side panel, highlight passages, and attach questions or notes — all without leaving your terminal.
 
 Annotations are automatically injected as context into your next Claude Code prompt, so Claude sees exactly what you're referring to.
 
@@ -13,8 +13,8 @@ Claude Code response          Neovim annotator panel
  │ for the feature: │  ───►   │ for the feature:     │
  │ 1. Add endpoint  │         │ 1. Add endpoint      │
  │ 2. Update UI     │         │ ──────────────────── │
- │ ...              │         │  ✎ EDIT: use PATCH   │
- └──────────────────┘         │    not POST          │
+ │ ...              │         │  ? QUESTION: why not │
+ └──────────────────┘         │    use PATCH?        │
                               │ 2. Update UI         │
                               └──────────────────────┘
 ```
@@ -134,6 +134,7 @@ All keybindings use `<leader>` (default: `\`).
 | Mode | Key | Action |
 |------|-----|--------|
 | Visual | `<leader>ca` | **Annotate** — select text, pick a type, write your annotation |
+| Normal | `<leader>ce` | **Edit** — edit the annotation at the cursor |
 | Normal | `<leader>cp` | **Push** — queue all pending annotations for the next prompt |
 | Normal | `<leader>ct` | **Toggle** — switch between message view and plan view |
 | Normal | `<leader>cl` | **List** — toggle the annotation list sidebar |
@@ -142,7 +143,6 @@ All keybindings use `<leader>` (default: `\`).
 
 | Type | Key | Purpose |
 |------|-----|---------|
-| **Edit** | `e` | Request a change to the highlighted code/text |
 | **Question** | `q` | Ask Claude about the highlighted passage |
 | **Note** | `n` | Add context for Claude to keep in mind |
 
@@ -152,11 +152,12 @@ All keybindings use `<leader>` (default: `\`).
 2. Open the annotator (`Alt+Shift+A` or `:ClaudeAnnotatorOpen`)
 3. Read through the content — use `<leader>ct` to toggle between message and plan
 4. Select text in visual mode, press `<leader>ca`
-5. Choose annotation type: `e` (edit), `q` (question), or `n` (note)
+5. Choose annotation type: `q` (question) or `n` (note)
 6. Type your annotation content and press Enter
-7. Repeat for additional annotations
-8. Press `<leader>cp` to push all pending annotations
-9. Go back to Claude Code and submit your next prompt — annotations are included automatically
+7. To edit an existing annotation, place cursor on the annotated line and press `<leader>ce`
+8. Repeat for additional annotations
+9. Press `<leader>cp` to push all pending annotations
+10. Go back to Claude Code and submit your next prompt — annotations are included automatically
 
 ### Auto-reload
 
@@ -209,7 +210,6 @@ The annotator watches for changes in real time:
 The plugin uses [Catppuccin Mocha](https://github.com/catppuccin/catppuccin) colors by default. Override the highlight groups in your Neovim config:
 
 ```lua
-vim.api.nvim_set_hl(0, "ClaudeAnnotateEdit", { fg = "#f38ba8", bold = true })
 vim.api.nvim_set_hl(0, "ClaudeAnnotateQuestion", { fg = "#89b4fa", bold = true })
 vim.api.nvim_set_hl(0, "ClaudeAnnotateNote", { fg = "#a6adc8", bold = true })
 ```

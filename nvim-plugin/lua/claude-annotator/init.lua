@@ -11,22 +11,20 @@ function M.setup()
   local push = require("claude-annotator.push")
   local display = require("claude-annotator.display")
 
-  -- Register filetype
+  -- Register filetype and map it to the markdown treesitter parser
   vim.filetype.add({
     pattern = {
       ["claude%-response"] = "claude-response",
     },
   })
+  vim.treesitter.language.register("markdown", "claude-response")
 
   -- Highlight groups
   local function set_highlights()
-    vim.api.nvim_set_hl(0, "ClaudeAnnotateEdit", { fg = "#f38ba8", bold = true })
     vim.api.nvim_set_hl(0, "ClaudeAnnotateQuestion", { fg = "#89b4fa", bold = true })
     vim.api.nvim_set_hl(0, "ClaudeAnnotateNote", { fg = "#a6adc8", bold = true })
-    vim.api.nvim_set_hl(0, "ClaudeAnnotateEditDim", { fg = "#f38ba8", bold = false })
     vim.api.nvim_set_hl(0, "ClaudeAnnotateQuestionDim", { fg = "#89b4fa", bold = false })
     vim.api.nvim_set_hl(0, "ClaudeAnnotateNoteDim", { fg = "#a6adc8", bold = false })
-    vim.api.nvim_set_hl(0, "ClaudeAnnotateBorderEdit", { fg = "#f38ba8" })
     vim.api.nvim_set_hl(0, "ClaudeAnnotateBorderQuestion", { fg = "#89b4fa" })
     vim.api.nvim_set_hl(0, "ClaudeAnnotateBorderNote", { fg = "#a6adc8" })
     vim.api.nvim_set_hl(0, "ClaudeAnnotateLabel", { fg = "#cdd6f4", bold = true })
@@ -55,6 +53,11 @@ function M.setup()
   vim.keymap.set("v", "<leader>ca", function()
     annotate.create_from_visual()
   end, { desc = "Claude: Annotate selection" })
+
+  -- Keymaps (normal mode) — edit annotation at cursor
+  vim.keymap.set("n", "<leader>ce", function()
+    annotate.edit_at_cursor()
+  end, { desc = "Claude: Edit annotation at cursor" })
 
   -- Keymaps (normal mode) — push annotations
   vim.keymap.set("n", "<leader>cp", function()

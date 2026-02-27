@@ -18,15 +18,8 @@ const IPC_DIR = path.join(
 );
 const PENDING_FILE = path.join(IPC_DIR, "pending-annotations.json");
 
-const TYPE_LABELS = {
-  note: "Note",
-  edit: "Edit",
-  question: "Question",
-};
-
 function composeAnnotations(annotations) {
   const notes = annotations.filter((a) => a.type === "note");
-  const edits = annotations.filter((a) => a.type === "edit");
   const questions = annotations.filter((a) => a.type === "question");
 
   const sections = [];
@@ -35,14 +28,6 @@ function composeAnnotations(annotations) {
     const parts = ["**Context notes** (keep these in mind going forward):"];
     for (const n of notes) {
       parts.push(`\n> ${n.anchor_text}\n\n${n.content}`);
-    }
-    sections.push(parts.join("\n"));
-  }
-
-  if (edits.length > 0) {
-    const parts = ["**Requested changes:**"];
-    for (const e of edits) {
-      parts.push(`\n> ${e.anchor_text}\n\n${e.content}`);
     }
     sections.push(parts.join("\n"));
   }
