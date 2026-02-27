@@ -76,6 +76,15 @@ function M.start(bufnr)
       handles[#handles + 1] = plan_handle
     end
   end
+
+  -- Watch active transcript file for live message updates
+  local transcript_path = loader.find_active_transcript()
+  if transcript_path then
+    local transcript_handle = watch_path(transcript_path, bufnr)
+    if transcript_handle then
+      handles[#handles + 1] = transcript_handle
+    end
+  end
 end
 
 --- Stop all file watchers

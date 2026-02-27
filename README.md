@@ -163,8 +163,10 @@ All keybindings use `<leader>` (default: `\`).
 
 The annotator watches for changes in real time:
 
-- When Claude produces a new response, the buffer updates automatically (in message view)
-- When a plan file is created or updated, the buffer updates automatically (in plan view)
+- **Message view** — watches the active Claude Code transcript (`.jsonl`) file directly. Because transcripts are written to continuously mid-turn, the message view updates live as Claude produces new assistant text — no need to wait for the turn to finish. The `on-stop.js` IPC file is used as a fallback when no transcript is available.
+- **Plan view** — watches `~/.claude/plans/` for created or modified plan files.
+
+Content dedup prevents unnecessary buffer refreshes: if the latest assistant text hasn't changed (e.g., Claude is executing tool calls), the buffer and any annotations on it are left untouched.
 
 ## Architecture
 
@@ -174,13 +176,15 @@ The annotator watches for changes in real time:
 │              │                     │   current-response.json          │
 │              │  on-prompt-submit.js│   pending-annotations.json       │
 │              │ ◄────────────────── │                                  │
-└─────────────┘                     └──────────┬───────────────────────┘
-                                               │ file watcher
-                                    ┌──────────▼───────────────────────┐
-                                    │ Neovim plugin                    │
-                                    │   loader.lua   — read content    │
-                                    │   watcher.lua  — watch for       │
-                                    │                  changes         │
+└──────┬──────┘                     └──────────┬───────────────────────┘
+       │                                       │ file watcher
+       │ writes transcript                     │
+       ▼                                       │
+┌──────────────────────┐            ┌──────────▼───────────────────────┐
+│ ~/.claude/projects/  │ ──────────►│ Neovim plugin                    │
+│   */*.jsonl          │  watched   │   loader.lua   — read content    │
+│   (live mid-turn)    │            │   watcher.lua  — watch for       │
+└──────────────────────┘            │                  changes         │
                                     │   annotate.lua — create          │
                                     │                  annotations     │
                                     │   display.lua  — render extmarks │

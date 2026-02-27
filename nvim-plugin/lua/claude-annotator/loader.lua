@@ -24,9 +24,9 @@ local function read_ipc_response()
   return data
 end
 
---- Scan Claude transcript files for the most recent assistant message
----@return string|nil content
-local function read_transcript_fallback()
+--- Find the newest .jsonl transcript file across all Claude projects
+---@return string|nil filepath
+function M.find_active_transcript()
   local claude_dir = (os.getenv("HOME") or os.getenv("USERPROFILE")) .. "/.claude/projects"
   local projects = vim.fn.glob(claude_dir .. "/*", false, true)
 
@@ -44,6 +44,13 @@ local function read_transcript_fallback()
     end
   end
 
+  return newest_file
+end
+
+--- Scan Claude transcript files for the most recent assistant message
+---@return string|nil content
+local function read_transcript_fallback()
+  local newest_file = M.find_active_transcript()
   if not newest_file then
     return nil
   end
@@ -115,6 +122,7 @@ local function read_latest_plan()
 end
 
 --- Set buffer content and metadata
+--- Skips update if the new lines match what's already in the buffer (preserves annotations)
 ---@param bufnr number
 ---@param content string
 ---@param view_mode "message"|"plan"
@@ -122,6 +130,21 @@ end
 local function set_buffer(bufnr, content, view_mode, meta)
   meta = meta or {}
   local lines = vim.split(content, "\n")
+
+  -- Content dedup: skip if buffer already has identical lines
+  local current_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  if #lines == #current_lines then
+    local same = true
+    for i = 1, #lines do
+      if lines[i] ~= current_lines[i] then
+        same = false
+        break
+      end
+    end
+    if same then
+      return
+    end
+  end
 
   vim.bo[bufnr].modifiable = true
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
@@ -286,11 +309,20 @@ function M.reload(bufnr)
     vim.notify("Plan updated", vim.log.levels.INFO)
   else
     local data = read_ipc_response()
-    if not data then
+    local content = nil
+    local message_id = nil
+
+    if data then
+      content = data.content
+      message_id = data.message_id
+    else
+      content = read_transcript_fallback()
+    end
+
+    if not content then
       return
     end
-    set_buffer(bufnr, data.content, "message", { message_id = data.message_id })
-    vim.notify("Claude response updated", vim.log.levels.INFO)
+    set_buffer(bufnr, content, "message", { message_id = message_id })
   end
 end
 
