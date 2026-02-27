@@ -41,15 +41,43 @@ Claude Code response          Neovim annotator panel
 git clone https://github.com/JBillson/claude-annotator.git
 ```
 
-### 2. Install the Claude Code plugin
+### 2. Configure Claude Code hooks
 
-Register the plugin so Claude Code loads the hooks:
+Add the following to your Claude Code settings file (`~/.claude/settings.json`). This registers the two hooks that bridge Claude Code and the annotator:
 
-```bash
-claude plugin add /path/to/claude-annotator
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/path/to/claude-annotator/hooks/on-stop.js\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/path/to/claude-annotator/hooks/on-prompt-submit.js\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
 ```
 
-Or manually add the plugin path to your Claude Code configuration. The plugin directory is `.claude-plugin/` in this repo — it contains `plugin.json` which tells Claude Code about the hooks.
+Replace `/path/to/claude-annotator` with the absolute path where you cloned the repo. Use forward slashes on Windows (e.g., `C:/Users/you/claude-annotator`).
+
+- **`on-stop.js`** — runs after each Claude response, writes the content to `~/.claude-annotator/current-response.json`
+- **`on-prompt-submit.js`** — runs before each prompt, injects any pending annotations as context
 
 ### 3. Install the Neovim plugin
 
