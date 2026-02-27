@@ -13,5 +13,5 @@ if ($existing) {
     $existing | ForEach-Object { $_.CloseMainWindow() | Out-Null }
 } else {
     # Open as a vertical split pane in the current Windows Terminal window
-    wt -w 0 sp -V --size 0.35 --title "$PanelTitle" -- nvim -c "ClaudeAnnotatorOpen"
+    wt -w 0 sp -V --size 0.50 --title "$PanelTitle" -- nvim -c "ClaudeAnnotatorOpen"
 }
