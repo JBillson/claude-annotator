@@ -1,0 +1,5 @@
+{
+  "name": "claude-annotator",
+  "description": "Annotate Claude responses with inline questions, edits, and notes",
+  "author": "JBillson"
+}
